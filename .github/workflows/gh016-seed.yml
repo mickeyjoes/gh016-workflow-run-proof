@@ -1,0 +1,27 @@
+name: GH016 seed victim bot comment
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Researcher-owned victim PR number
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+      - name: Create or reset baseline bot comment
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH016_MODE: seed
+          PR_NUMBER: ${{ inputs.pr_number }}
+        run: node scripts/reporter.mjs
