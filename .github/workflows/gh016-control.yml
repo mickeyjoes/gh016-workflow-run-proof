@@ -25,21 +25,8 @@ jobs:
           path: pr-ci-metadata
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Capture actual workflow_run payload and artifact binding
-        run: |
-          mkdir -p gh016-evidence
-          cp "$GITHUB_EVENT_PATH" gh016-evidence/workflow_run.json
-          cp pr-ci-metadata/pr.json gh016-evidence/pr.json
       - name: Run corrected binding
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH016_MODE: control
         run: node scripts/reporter.mjs
-      - name: Upload hosted proof evidence
-        if: ${{ always() }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: gh016-control-evidence
-          path: gh016-evidence
-          if-no-files-found: error
-          retention-days: 7
